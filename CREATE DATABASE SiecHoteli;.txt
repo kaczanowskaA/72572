@@ -1,0 +1,72 @@
+CREATE DATABASE SiecHoteli;
+GO
+
+USE SiecHoteli;
+GO
+
+-- Tabela Goście
+CREATE TABLE Guests (
+    ID_Guest INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(50) NOT NULL,
+    Surname NVARCHAR(50) NOT NULL,
+    Email NVARCHAR(100),
+    Phone_Number NVARCHAR(20)
+);
+
+-- Tabela Hotele  
+CREATE TABLE Hotels (
+    ID_Hotel INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    City NVARCHAR(50),
+    Address NVARCHAR(150),
+    Stars INT CHECK (Stars >= 1 AND Stars <= 5)
+);
+
+-- Tabela Pokoje
+CREATE TABLE Rooms (
+    ID_Room INT IDENTITY(1,1) PRIMARY KEY,
+    ID_Hotel INT NOT NULL,
+    Room_Number NVARCHAR(10) NOT NULL,
+    Type NVARCHAR(50),
+    Price_Per_Day DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (ID_Hotel) REFERENCES Hotels(ID_Hotel)
+);
+
+-- Tabela Rezerwacje
+CREATE TABLE Reservations (
+    ID_Reservation INT IDENTITY(1,1) PRIMARY KEY,
+    ID_Guest INT NOT NULL,
+    ID_Room INT NOT NULL,
+    Start_Date DATE NOT NULL,
+    End_Date DATE NOT NULL,
+    Reservation_Status NVARCHAR(20) DEFAULT 'Oczekująca',
+    FOREIGN KEY (ID_Guest) REFERENCES Guests(ID_Guest),
+    FOREIGN KEY (ID_Room) REFERENCES Rooms(ID_Room)
+);
+
+-- Tabela Płatności
+CREATE TABLE Payments (
+    ID_Payment INT IDENTITY(1,1) PRIMARY KEY,
+    ID_Reservation INT NOT NULL,
+    Amount DECIMAL(10,2) NOT NULL,
+    Payment_Date DATETIME NOT NULL,
+    Payment_Method NVARCHAR(30),
+    FOREIGN KEY (ID_Reservation) REFERENCES Reservations(ID_Reservation)
+);
+
+-- Przykładowe dane
+INSERT INTO Guests (Name, Surname, Email, Phone_Number) VALUES
+('Jan', 'Kowalski', 'jan.kowalski@email.com', '123-456-789'),
+('Anna', 'Nowak', 'anna.nowak@gmail.com', '987-654-321'),
+('Piotr', 'Wiśniewski', 'piotr.wisniewski@outlook.com', '555-123-456');
+
+INSERT INTO Hotels (Name, City, Address, Stars) VALUES
+('Hotel Marriott', 'Warszawa', 'ul. Jerozolimskie 65/79', 5),
+('Hotel Mercure', 'Kraków', 'ul. Pawia 15', 4),
+('Hotel Ibis', 'Gdańsk', 'ul. Heweliusza 22', 3);
+
+INSERT INTO Rooms (ID_Hotel, Room_Number, Type, Price_Per_Day) VALUES
+(1, '101', 'Standard', 299.00),
+(1, '205', 'Deluxe', 399.00),
+(2, '102', 'Standard', 249.00),
+(3, '105', 'Standard', 199.00);
